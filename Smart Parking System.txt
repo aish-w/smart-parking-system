@@ -1,0 +1,75 @@
+#include <ESP8266WiFi.h>
+#include <Servo.h>
+
+// WiFi credentials
+const char* ssid = "your_wifi_ssid";
+const char* password = "your_wifi_password";
+
+// PIR sensor pin
+const int pirPin = D1;
+// Ultrasonic sensor pins
+const int trigPin = D2;
+const int echoPin = D3;
+// Servo motor pin
+const int servoPin = D4;
+
+Servo servo;
+
+void setup() {
+  Serial.begin(115200);
+
+  // Initialize PIR sensor
+  pinMode(pirPin, INPUT);
+
+  // Initialize ultrasonic sensor
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+
+  // Initialize servo motor
+  servo.attach(servoPin);
+  servo.write(90); // Set initial position
+
+  // Connect to WiFi
+  WiFi.begin(ssid, password);
+  Serial.print("Connecting to WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("WiFi connected.");
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+}
+
+void loop() {
+  // Check PIR sensor
+  int pirValue = digitalRead(pirPin);
+  if (pirValue == HIGH) {
+    Serial.println("Motion detected!");
+    // Open the dustbin lid
+    servo.write(0); // Open position
+    delay(1000); // Allow time for the lid to open fully
+    // Wait for a moment
+    delay(5000); // Assuming someone will put the trash in the bin
+    // Close the dustbin lid
+    servo.write(90); // Close position
+    delay(1000); // Allow time for the lid to close fully
+  }
+
+  // Check ultrasonic sensor
+  long duration, distance;
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2;
+  Serial.print("Distance: ");
+  Serial.print(distance);
+  Serial.println(" cm");
+
+  // Add your logic here based on the distance, for example, to notify if the bin is full.
+
+  delay(1000); // Delay between readings
+}
