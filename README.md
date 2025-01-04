@@ -5,4 +5,3 @@ The Smart Parking System is designed using an ESP32 microcontroller, RFID techno
 # Working Video
 https://github.com/aish-w/smart-parking-system/assets/111682433/23638896-4665-46a7-9e69-567db62b278e
 
-
